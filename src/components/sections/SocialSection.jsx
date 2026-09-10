@@ -277,9 +277,6 @@ export function PaidMediaSection({ platform, month, campanas, allCampanas = [], 
     }
   }, [groups, bucket])
 
-  if (platProy.length === 0 && inversionTotal === 0) return null
-
-
   const projectionSummary = useMemo(
     () => buildPlatformProjectionSummary(proyecciones, platform, month),
     [proyecciones, platform, month]
@@ -356,6 +353,10 @@ export function PaidMediaSection({ platform, month, campanas, allCampanas = [], 
   const groupLabel     = groups.find(g => g.key === bucket)?.label || bucket
   const prevInversion = useMemo(() => campanaInversion((allCampanas || []).filter(r => r.mes === pm), platform, null), [allCampanas, platform, pm])
   const yearInversion = useMemo(() => campanaInversion((allCampanas || []).filter(r => r.mes === py), platform, null), [allCampanas, platform, py])
+
+  // IMPORTANTE: este return condicional va DESPUÉS de todos los hooks (arriba)
+  // para no violar las Reglas de los Hooks de React (causaba error #310 en prod).
+  if (platProy.length === 0 && inversionTotal === 0) return null
 
   // Subtítulo del header
   const subtitle = [
