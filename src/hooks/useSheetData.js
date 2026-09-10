@@ -4,7 +4,11 @@ import { normalizeImageUrl } from '../utils/urls'
 import { enrichCampaign } from '../utils/campaigns'
 import { processSheet } from '../utils/sheetDataParser'
 
-const SHEET_ID = import.meta.env.VITE_SHEET_ID
+// Fallback: si VITE_SHEET_ID no está configurada como variable de entorno
+// (p.ej. no se agregó en Vercel o no se hizo Redeploy después de agregarla),
+// el dashboard sigue funcionando con el Sheet de Tyson conocido.
+const DEFAULT_SHEET_ID = '1aCIaRo6i6vNez6zsEwMzhuhgxFCLhc9zmwA6ohk3RVQ'
+const SHEET_ID = import.meta.env.VITE_SHEET_ID || DEFAULT_SHEET_ID
 
 function getSheetURL(sheetName) {
   return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`
@@ -240,15 +244,15 @@ export function useSheetData(marcaId) {
       ] = await Promise.all([
         fetchSheet('_CONFIG'),
         fetchSheet('_MARCAS'),
-        fetchSheet('Facebook'),
-        fetchSheet('Instagram'),
-        fetchSheet('TikTok'),
+        fetchSheet('Facebook').catch(() => []),
+        fetchSheet('Instagram').catch(() => []),
+        fetchSheet('TikTok').catch(() => []),
         fetchSheet('GoogleAds').catch(() => []),
         fetchSheet('GoogleAds_Ciudades').catch(() => []),
         fetchSheet('GoogleAds_Keywords').catch(() => []),
         fetchSheet('Campañas').catch(() => fetchSheet('Campanas').catch(() => [])),
-        fetchSheet('TopPosts'),
-        fetchSheet('Sentiment'),
+        fetchSheet('TopPosts').catch(() => []),
+        fetchSheet('Sentiment').catch(() => []),
         fetchSheet('Sentiment_Capturas').catch(() => []),
         fetchSheet('Competencia').catch(() => []),
         fetchSheet('Hallazgos').catch(() => []),
